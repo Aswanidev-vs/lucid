@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dreams — Dream Journal</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+
+<div class="container">
+
+    <header class="hero-section">
+        <div class="brand-mark">
+            <h1 class="brand-title">Your Dreams</h1>
+            <p class="brand-subtitle">Explore your dream collection</p>
+        </div>
+        <nav class="nav-links">
+            <a class="btn btn-ghost" href="/">← Back to dreams</a>
+            <a class="btn btn-secondary" href="/dreams/public">Public Dreams</a>
+            <a class="btn btn-primary" href="/dreams/new">+ New Dream</a>
+        </nav>
+    </header>
+
+    {{if .}}
+
+    <div class="dreams-toolbar">
+        <div class="dreams-count">
+            <span class="count-number">{{len .}}</span>
+            <span class="count-label">dream{{if ne (len .) 1}}s{{end}} recorded</span>
+        </div>
+        <div class="toolbar-actions">
+            <button class="btn btn-secondary" onclick="window.location.href='/dreams/new'">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="12" y1="5" x2="12" y2="19"/>
+                    <line x1="5" y1="12" x2="19" y2="12"/>
+                </svg>
+                New Dream
+            </button>
+        </div>
+    </div>
+
+    <div class="dreams-list">
+        {{range $i, $dream := .}}
+        <article class="dream-card" data-mood="{{$dream.Mood}}" style="animation-delay: {{$i}}00ms">
+            <div class="card-header">
+                <div class="card-title-group">
+                    <h2 class="dream-title">{{$dream.Title}}</h2>
+                    <div class="card-badges">
+                        {{if $dream.Mood}}
+                            <div class="mood-badge" data-mood="{{$dream.Mood}}">
+                                <span class="mood-dot" aria-hidden="true"></span>
+                                <span class="mood-text">{{$dream.Mood}}</span>
+                            </div>
+                        {{else}}
+                            <div class="mood-badge mood-badge--empty">
+                                <span class="mood-dot" aria-hidden="true"></span>
+                                <span class="mood-text">No mood</span>
+                            </div>
+                        {{end}}
+                        {{if $dream.IsPublic}}
+                            <div class="visibility-badge">
+                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                                    <circle cx="12" cy="12" r="3"/>
+                                </svg>
+                                Public
+                            </div>
+                        {{else}}
+                            <div class="visibility-badge visibility-private">
+                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+                                    <circle cx="12" cy="16" r="1"/>
+                                    <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+                                </svg>
+                                Private
+                            </div>
+                        {{end}}
+                        <span class="char-counter">{{len $dream.Content}} characters</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="dream-content clamp-3" id="content-{{$i}}">{{$dream.Content}}</div>
+
+            <button class="btn-expand" onclick="toggleExpand(this, 'content-{{$i}}')" aria-label="Expand content">
+                <span class="expand-text">Read more</span>
+                <svg class="expand-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="6 9 12 15 18 9"/>
+                </svg>
+            </button>
+
+            <div class="card-footer">
+                <time class="dream-date" datetime="{{$dream.CreatedAt}}">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="10"/>
+                        <polyline points="12 6 12 12 16 14"/>
+                    </svg>
+                    {{$dream.CreatedAt}}
+                </time>
+                <div class="card-actions">
+                    <a class="btn btn-ghost btn-sm" href="/dreams/{{$dream.Id}}" title="View dream">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                            <circle cx="12" cy="12" r="3"/>
+                        </svg>
+                        View
+                    </a>
+                    <a class="btn btn-ghost btn-sm" href="/dreams/{{$dream.Id}}/edit" title="Edit dream">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+                            <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+                        </svg>
+                        Edit
+                    </a>
+                </div>
+            </div>
+        </article>
+        {{end}}
+    </div>
+
+    {{else}}
+
+    <div class="empty-state">
+        <div class="empty-icon" aria-hidden="true">
+            <svg width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7z"/>
+                <circle cx="12" cy="12" r="3"/>
+            </svg>
+        </div>
+        <h2 class="empty-title">No dreams yet</h2>
+        <p class="empty-description">Your dream journal is waiting for its first entry. Start capturing your nocturnal adventures and build a beautiful collection of memories.</p>
+        <div class="empty-actions">
+            <a class="btn btn-primary btn-lg" href="/dreams/new">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="12" y1="5" x2="12" y2="19"/>
+                    <line x1="5" y1="12" x2="19" y2="12"/>
+                </svg>
+                Record your first dream
+            </a>
+        </div>
+    </div>
+
+    {{end}}
+
+</div>
+
+<script>
+function toggleExpand(btn, contentId) {
+    const content = document.getElementById(contentId);
+    const isExpanded = content.classList.toggle('expanded');
+    const text = btn.querySelector('.expand-text');
+    const icon = btn.querySelector('.expand-icon');
+    text.textContent = isExpanded ? 'Show less' : 'Read more';
+    icon.style.transform = isExpanded ? 'rotate(180deg)' : 'rotate(0deg)';
+}
+</script>
+
+</body>
+</html>
