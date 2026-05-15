@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{.Profile.Username}} — Lucid</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+<div class="container">
+
+    <nav class="top-nav">
+        <a href="/" class="nav-brand">
+            <div class="nav-logo">✦</div>
+            <span class="nav-brand-text">Lucid</span>
+        </a>
+        <div class="nav-links">
+            <a href="/" class="nav-link">Home</a>
+            <a href="/feed" class="nav-link">Feed</a>
+            {{if .IsLoggedIn}}
+                <a href="/dreams" class="nav-link">My Dreams</a>
+            {{end}}
+        </div>
+        <div class="nav-right">
+            {{if .IsLoggedIn}}
+                <a href="/dreams/new" class="btn btn-primary btn-sm">+ New Dream</a>
+                <form action="/logout" method="POST" style="display:inline">
+                    <button type="submit" class="btn btn-ghost btn-sm">Logout</button>
+                </form>
+            {{else}}
+                <a href="/login" class="btn btn-secondary btn-sm">Sign In</a>
+                <a href="/signup" class="btn btn-primary btn-sm">Join</a>
+            {{end}}
+        </div>
+    </nav>
+
+    <div class="profile-header">
+        <div class="profile-avatar-large">{{.Profile.Username | firstChar}}</div>
+        <div class="profile-info">
+            <h2>{{.Profile.Username}}</h2>
+            <div class="profile-meta">
+                <span class="profile-badge">{{.Profile.DreamerType}}</span>
+                <span class="profile-stat"><strong>{{.Profile.DreamCount}}</strong> dreams</span>
+                <span class="profile-stat"><strong>{{.Profile.TotalLikes}}</strong> likes received</span>
+                <span class="profile-stat">Joined {{.Profile.CreatedAt | formatTime}}</span>
+            </div>
+            {{if .Profile.Bio}}
+                <p class="profile-bio">{{.Profile.Bio}}</p>
+            {{end}}
+            {{if .IsOwner}}
+                <button class="btn btn-secondary btn-sm" onclick="showEditProfile()">Edit Profile</button>
+                <a href="/export" class="btn btn-secondary btn-sm">Export Data</a>
+                <button class="btn btn-secondary btn-sm" onclick="showImportForm()">Import Data</button>
+            {{end}}
+        </div>
+    </div>
+
+    {{if .CategoryCounts}}
+    <div class="profile-categories">
+        {{range .CategoryCounts}}
+            <div class="category-stat-card">
+                <span class="cat-emoji">{{.emoji}}</span>
+                <span class="cat-name">{{.name}}</span>
+                <span class="cat-count">{{.count}}</span>
+            </div>
+        {{end}}
+    </div>
+    {{end}}
+
+    {{if .Imported}}
+    <div class="import-alert" id="importAlert">
+        <span>Successfully imported {{.Imported}} dream{{if ne .Imported 1}}s{{end}}{{if .Skipped}}, {{.Skipped}} skipped{{end}}!</span>
+    </div>
+    {{end}}
+
+    {{if .IsOwner}}
+    <div id="importForm" class="edit-profile-form" style="display:none">
+        <div class="form-card">
+            <h3 style="margin-bottom:16px;">Import Dreams from JSON</h3>
+            <p class="muted" style="margin-bottom:20px;">Upload a JSON file previously exported from Lucid.</p>
+            <form action="/import" method="POST" enctype="multipart/form-data">
+                <div class="form-group">
+                    <label for="import_file">Select JSON File</label>
+                    <input type="file" id="import_file" name="import_file" accept=".json" required>
+                </div>
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-primary">Import</button>
+                    <button type="button" class="btn btn-secondary" onclick="hideImportForm()">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div id="editProfileForm" class="edit-profile-form" style="display:none">
+        <div class="form-card">
+            <h3 style="margin-bottom:16px;">Edit Profile</h3>
+            <form action="/profile/update" method="POST">
+                <div class="form-group">
+                    <label for="bio">Bio</label>
+                    <textarea id="bio" name="bio" placeholder="Tell the dream community about yourself..." rows="3">{{.Profile.Bio}}</textarea>
+                </div>
+                <div class="form-group">
+                    <label for="dreamer_type">Dreamer Type</label>
+                    <select id="dreamer_type" name="dreamer_type" class="form-select">
+                        <option value="Explorer" {{if eq .Profile.DreamerType "Explorer"}}selected{{end}}>Explorer</option>
+                        <option value="Lucid Dreamer" {{if eq .Profile.DreamerType "Lucid Dreamer"}}selected{{end}}>Lucid Dreamer</option>
+                        <option value="Nightmare Survivor" {{if eq .Profile.DreamerType "Nightmare Survivor"}}selected{{end}}>Nightmare Survivor</option>
+                        <option value="Prophet" {{if eq .Profile.DreamerType "Prophet"}}selected{{end}}>Prophet</option>
+                        <option value="Dream Architect" {{if eq .Profile.DreamerType "Dream Architect"}}selected{{end}}>Dream Architect</option>
+                        <option value="Oneironaut" {{if eq .Profile.DreamerType "Oneironaut"}}selected{{end}}>Oneironaut</option>
+                    </select>
+                </div>
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-primary">Save Changes</button>
+                    <button type="button" class="btn btn-secondary" onclick="hideEditProfile()">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    {{end}}
+
+    <div class="profile-section">
+        <h2 class="section-title">
+            Dreams
+            {{if not .IsOwner}}
+                <span class="muted">(public only)</span>
+            {{end}}
+        </h2>
+
+        {{if .Dreams}}
+            <div class="dreams-list">
+            {{range $i, $dream := .Dreams}}
+                <article class="dream-card" data-mood="{{$dream.Mood}}" style="animation-delay: {{$i}}00ms">
+                    <div class="card-header">
+                        <div class="card-title-group">
+                            <h2 class="dream-title"><a href="/dreams/{{$dream.ID}}" class="dream-link">{{$dream.Title}}</a></h2>
+                            <div class="card-badges">
+                                {{if $dream.CategoryName}}
+                                    <span class="category-badge">{{$dream.CategoryEmoji}} {{$dream.CategoryName}}</span>
+                                {{end}}
+                                {{if $dream.Mood}}
+                                    <span class="mood-badge" data-mood="{{$dream.Mood}}"><span class="mood-dot"></span>{{$dream.Mood}}</span>
+                                {{end}}
+                                {{if $dream.Visibility}}
+                                    <span class="visibility-badge {{if eq $dream.Visibility "private"}}visibility-private{{end}}">
+                                        {{if eq $dream.Visibility "public"}}Public{{else}}Private{{end}}
+                                    </span>
+                                {{end}}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="dream-content clamp-3">{{$dream.Content}}</div>
+                    <div class="card-footer">
+                        <time class="dream-date">{{$dream.CreatedAt | formatTime}}</time>
+                        <div class="card-actions">
+                            <span class="feed-stat" style="font-size:13px;color:var(--text-muted);">Likes: {{$dream.LikeCount}} · Comments: {{$dream.CommentCount}}</span>
+                            {{if $.IsOwner}}
+                                <a href="/dreams/{{$dream.ID}}/edit" class="btn btn-ghost btn-sm">Edit</a>
+                            {{end}}
+                        </div>
+                    </div>
+                </article>
+            {{end}}
+            </div>
+        {{else}}
+            <div class="empty-state">
+                <p class="empty-description">No dreams yet.</p>
+            </div>
+        {{end}}
+    </div>
+</div>
+
+<script>
+function showEditProfile() {
+    document.getElementById('editProfileForm').style.display = 'block';
+    document.getElementById('importForm').style.display = 'none';
+}
+function hideEditProfile() {
+    document.getElementById('editProfileForm').style.display = 'none';
+}
+function showImportForm() {
+    document.getElementById('importForm').style.display = 'block';
+    document.getElementById('editProfileForm').style.display = 'none';
+}
+function hideImportForm() {
+    document.getElementById('importForm').style.display = 'none';
+}
+window.addEventListener('load', function() {
+    var alert = document.getElementById('importAlert');
+    if (alert) {
+        setTimeout(function() { alert.style.display = 'none'; }, 5000);
+    }
+});
+</script>
+</body>
+</html>

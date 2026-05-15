@@ -3,29 +3,35 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Edit: {{.Title}} — Dream Journal</title>
+    <title>Edit: {{.Title}} — Lucid</title>
     <link rel="stylesheet" href="/static/style.css">
 </head>
 <body>
 
 <div class="container">
 
-    <header class="hero-section">
-        <div class="brand-mark">
-            <h1 class="brand-title">Edit Dream</h1>
-            <p class="brand-subtitle">Update your dream details</p>
+    <nav class="top-nav">
+        <a href="/" class="nav-brand">
+            <div class="nav-logo">✦</div>
+            <span class="nav-brand-text">Lucid</span>
+        </a>
+        <div class="nav-links">
+            <a href="/" class="nav-link">Home</a>
+            <a href="/dreams" class="nav-link">My Dreams</a>
+            <a href="/dreams/{{.Id}}" class="nav-link">View Dream</a>
         </div>
-
-        <nav class="nav-links">
-            <a class="btn btn-ghost" href="/dreams/{{.Id}}">← Back to dream</a>
-        </nav>
-    </header>
+        <div class="nav-right">
+            <form action="/logout" method="POST" style="display:inline">
+                <button type="submit" class="btn btn-ghost btn-sm">Logout</button>
+            </form>
+        </div>
+    </nav>
 
     <div class="form-container">
         <section class="form-card">
             <div class="form-header">
-                <h2>Edit Dream Details</h2>
-                <p>Make changes to your recorded dream</p>
+                <h2>Edit Dream</h2>
+                <p>Update your recorded dream</p>
             </div>
 
             <form action="/dreams/{{.Id}}" method="POST" id="dreamForm" novalidate>
@@ -43,71 +49,45 @@
                 </div>
 
                 <div class="form-group">
-                    <label for="mood">How did it feel? (Optional)</label>
-
+                    <label>Mood</label>
                     <div class="mood-chips" role="listbox" aria-label="Select a mood">
-                        <button type="button" class="mood-chip" data-mood="Calm">
-                            <span class="chip-emoji">😌</span>
-                            Calm
-                        </button>
-                        <button type="button" class="mood-chip" data-mood="Haunted">
-                            <span class="chip-emoji">👻</span>
-                            Haunted
-                        </button>
-                        <button type="button" class="mood-chip" data-mood="Inspired">
-                            <span class="chip-emoji">✨</span>
-                            Inspired
-                        </button>
-                        <button type="button" class="mood-chip" data-mood="Happy">
-                            <span class="chip-emoji">😊</span>
-                            Happy
-                        </button>
-                        <button type="button" class="mood-chip" data-mood="Anxious">
-                            <span class="chip-emoji">😰</span>
-                            Anxious
-                        </button>
-                        <button type="button" class="mood-chip" data-mood="">
-                            <span class="chip-emoji">🤔</span>
-                            No mood
-                        </button>
+                        <button type="button" class="mood-chip" data-mood="Calm"><span class="chip-emoji">😌</span> Calm</button>
+                        <button type="button" class="mood-chip" data-mood="Haunted"><span class="chip-emoji">👻</span> Haunted</button>
+                        <button type="button" class="mood-chip" data-mood="Inspired"><span class="chip-emoji">✨</span> Inspired</button>
+                        <button type="button" class="mood-chip" data-mood="Happy"><span class="chip-emoji">😊</span> Happy</button>
+                        <button type="button" class="mood-chip" data-mood="Anxious"><span class="chip-emoji">😰</span> Anxious</button>
+                        <button type="button" class="mood-chip" data-mood=""><span class="chip-emoji">🤔</span> No mood</button>
                     </div>
-
                     <input id="mood" type="text" name="mood" placeholder="Or describe your own feeling..." value="{{.Mood}}" autocomplete="off">
                     <div class="field-helper">Select from options above or type your own mood</div>
                 </div>
 
                 <div class="form-group">
                     <label>Visibility</label>
-
                     <div class="visibility-toggle">
                         <input type="checkbox" id="is_public" name="is_public" {{if .IsPublic}}checked{{end}}>
                         <label for="is_public" class="toggle-label">
                             <span class="toggle-slider"></span>
-                            <span class="toggle-text">{{if .IsPublic}}Public dream{{else}}Make this dream public{{end}}</span>
+                            <span class="toggle-text">{{if .IsPublic}}Public{{else}}Make this dream public{{end}}</span>
                         </label>
                     </div>
-
-                    <div class="field-helper">Public dreams can be viewed by anyone with the link. Private dreams are only visible to you.</div>
+                    <div class="field-helper">Public dreams can be viewed by anyone. Private dreams are only visible to you.</div>
                 </div>
 
                 <div class="form-actions">
-                    <button type="submit" class="btn btn-primary btn-lg">
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <button type="submit" class="btn btn-primary btn-lg btn-full">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                             <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2z"/>
                             <polyline points="10.5 11.5 13.5 8.5 16.5 11.5"/>
                             <line x1="10.5" y1="13.5" x2="16.5" y2="13.5"/>
                         </svg>
                         Update Dream
                     </button>
-                    <a href="/dreams/{{.Id}}" class="btn btn-secondary">Cancel</a>
+                    <a href="/dreams/{{.Id}}" class="btn btn-secondary btn-full">Cancel</a>
                 </div>
             </form>
         </section>
     </div>
-
-    <footer class="form-footer">
-        <p>💫 Your dream's story is yours to shape.</p>
-    </footer>
 
 </div>
 
@@ -135,11 +115,7 @@
 
   if (moodInput) {
     moodInput.addEventListener('input', () => {
-      // If user types custom mood, clear active chip highlight.
       moodChips.forEach(btn => btn.classList.remove('is-active'));
-      if (moodInput.value.trim() === '') {
-        // keep none active; user can pick a chip again
-      }
     });
   }
 
@@ -154,7 +130,6 @@
     updateCharCounter();
   }
 
-  // Initialize active chip from existing input value (if any)
   setActiveMood(moodInput && moodInput.value ? moodInput.value : '');
 })();
 </script>

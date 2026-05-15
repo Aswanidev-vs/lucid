@@ -3,77 +3,149 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dream Journal - Capture Your Dreams</title>
+    <title>Lucid — Your Dream Sanctuary</title>
     <link rel="stylesheet" href="/static/style.css">
 </head>
-<body>
+<body class="landing-page">
 
-<div class="container">
-    <header class="hero-section">
-        <div class="brand-mark">
-            <h1 class="brand-title">Dream Journal</h1>
-            <p class="brand-subtitle">Capture your dreams, explore your subconscious mind.</p>
+<div class="landing-header">
+    <nav class="top-nav">
+        <a href="/" class="nav-brand">
+            <div class="nav-logo">✦</div>
+            <span class="nav-brand-text">Lucid</span>
+        </a>
+        <div class="nav-links">
+            <a href="/feed" class="nav-link">Feed</a>
+            <a href="/dreams/public" class="nav-link">Public Dreams</a>
+            {{if .IsLoggedIn}}
+                <a href="/dreams" class="nav-link">My Dreams</a>
+            {{end}}
         </div>
-        <nav class="nav-links">
-            <a class="btn btn-ghost" href="/dreams">View Dreams</a>
-            <a class="btn btn-secondary" href="/dreams/public">Public Dreams</a>
-            <a class="btn btn-primary" href="/dreams/new">New Dream</a>
-        </nav>
-    </header>
-
-    <section class="hero-content">
-        <div class="hero-card">
-            <div class="hero-icon">
-                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7z"/>
-                    <circle cx="12" cy="12" r="3"/>
-                </svg>
-            </div>
-            <h2>Your Dream Sanctuary</h2>
-            <p>Transform fleeting dreams into lasting memories. Record your nocturnal adventures with rich details and moods that bring them to life.</p>
-            <div class="hero-actions">
-                <a class="btn btn-primary btn-lg" href="/dreams/new">Start Recording</a>
-                <a class="btn btn-secondary" href="/dreams">Explore Dreams</a>
-            </div>
+        <div class="nav-right">
+            {{if .IsLoggedIn}}
+                <a href="/dreams/new" class="btn btn-primary btn-sm">+ New Dream</a>
+                <form action="/logout" method="POST" style="display:inline">
+                    <button type="submit" class="btn btn-ghost btn-sm">Logout</button>
+                </form>
+            {{else}}
+                <a href="/login" class="btn btn-ghost btn-sm">Sign In</a>
+                <a href="/signup" class="btn btn-primary btn-sm">Get Started</a>
+            {{end}}
         </div>
-
-        <div class="features-grid">
-            <div class="feature-item">
-                <div class="feature-icon">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
-                        <polyline points="14,2 14,8 20,8"/>
-                    </svg>
-                </div>
-                <h3>Rich Details</h3>
-                <p>Capture every nuance of your dreams with unlimited text and optional mood tracking.</p>
-            </div>
-            <div class="feature-item">
-                <div class="feature-icon">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <circle cx="12" cy="12" r="10"/>
-                        <polyline points="12 6 12 12 16 14"/>
-                    </svg>
-                </div>
-                <h3>Timeless Archive</h3>
-                <p>Keep your dreams organized and searchable, with automatic timestamps for every entry.</p>
-            </div>
-            <div class="feature-item">
-                <div class="feature-icon">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
-                    </svg>
-                </div>
-                <h3>Personal & Private</h3>
-                <p>Your dreams are yours alone. Store them securely with no external sharing.</p>
-            </div>
-        </div>
-    </section>
-
-    <footer class="site-footer">
-        <p>💫 Mood tracking is optional—let your dreams guide you.</p>
-    </footer>
+    </nav>
 </div>
+
+<section class="hero">
+    <div class="hero-bg">
+        <div class="hero-bg-glow"></div>
+        <div class="hero-orb hero-orb-1"></div>
+        <div class="hero-orb hero-orb-2"></div>
+    </div>
+
+    <div class="hero-content-landing">
+        <div class="hero-badge">
+            <span>✦</span>
+            <span>{{if .IsLoggedIn}}Welcome back, {{.Username}}{{else}}Your dream journal, reimagined{{end}}</span>
+        </div>
+
+        <h1 class="hero-title">Where Dreams<br>Find Their Voice</h1>
+
+        <p class="hero-subtitle">
+            A beautiful sanctuary for your nocturnal adventures. Capture, organize, and reflect on the world that awakens when you sleep.
+        </p>
+
+        <div class="hero-actions">
+            {{if .IsLoggedIn}}
+                <a href="/dreams/new" class="btn btn-primary btn-lg">✦ Record a Dream</a>
+                <a href="/dreams" class="btn btn-secondary btn-lg">My Journal</a>
+            {{else}}
+                <a href="/signup" class="btn btn-primary btn-lg">✦ Start Journaling</a>
+                <a href="/feed" class="btn btn-secondary btn-lg">Explore Dreams</a>
+            {{end}}
+        </div>
+
+        <div class="hero-stats">
+            {{if .Trending}}
+            <div class="hero-stat">
+                <span class="hero-stat-number">{{len .Trending}}</span>
+                <span class="hero-stat-label">Trending Themes</span>
+            </div>
+            {{end}}
+            {{if .Categories}}
+            <div class="hero-stat">
+                <span class="hero-stat-number">{{len .Categories}}</span>
+                <span class="hero-stat-label">Dream Categories</span>
+            </div>
+            {{end}}
+            <div class="hero-stat">
+                <span class="hero-stat-number">∞</span>
+                <span class="hero-stat-label">Possibilities</span>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="features-section">
+    <p class="section-label">Why Lucid</p>
+    <h2 class="section-heading">Everything you need to<br>treasure your dreams</h2>
+
+    <div class="features-grid-landing">
+        <div class="feature-card-landing">
+            <div class="feature-icon-landing feature-icon-gold">📖</div>
+            <h3>Rich Dream Captures</h3>
+            <p>Record every detail with unlimited text, mood tracking, and customizable tags. Never lose a dream to the morning light again.</p>
+        </div>
+        <div class="feature-card-landing">
+            <div class="feature-icon-landing feature-icon-violet">🌙</div>
+            <h3>Mood &amp; Patterns</h3>
+            <p>Track emotional tones, lucidity levels, and dream types. Discover patterns in your subconscious with beautiful visual cues.</p>
+        </div>
+        <div class="feature-card-landing">
+            <div class="feature-icon-landing feature-icon-blue">🔒</div>
+            <h3>Your Private Sanctuary</h3>
+            <p>Complete control over your privacy. Keep dreams personal or share with the community — the choice is always yours.</p>
+        </div>
+    </div>
+</section>
+
+<section class="how-section">
+    <p class="section-label">How It Works</p>
+    <h2 class="section-heading">Three simple steps to<br>capture your dreams</h2>
+
+    <div class="steps-grid">
+        <div class="step-card">
+            <div class="step-number">1</div>
+            <h3>Record</h3>
+            <p>Write down your dream in vivid detail. Add a title, describe the experience, and capture the emotions you felt.</p>
+        </div>
+        <div class="step-card">
+            <div class="step-number">2</div>
+            <h3>Tag &amp; Organize</h3>
+            <p>Set the mood, choose a category, and add tags. Mark dreams as lucid, recurring, or nighttime adventures.</p>
+        </div>
+        <div class="step-card">
+            <div class="step-number">3</div>
+            <h3>Reflect &amp; Discover</h3>
+            <p>Browse your collection, explore trending themes, and uncover the hidden stories your subconscious is telling you.</p>
+        </div>
+    </div>
+</section>
+
+<section class="cta-section">
+    <div class="cta-card">
+        <h2>Begin your dream journey today</h2>
+        <p>Join a growing community of dreamers who have made Lucid their nightly companion. Your dreams are waiting to be written.</p>
+        {{if .IsLoggedIn}}
+            <a href="/dreams/new" class="btn btn-primary btn-lg">✦ Record Your Next Dream</a>
+        {{else}}
+            <a href="/signup" class="btn btn-primary btn-lg">✦ Create Your Free Account</a>
+        {{end}}
+    </div>
+</section>
+
+<footer class="landing-footer">
+    <p>Lucid Dream Journal &mdash; Built with care for dreamers everywhere</p>
+</footer>
 
 </body>
 </html>

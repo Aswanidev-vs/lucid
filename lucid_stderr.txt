@@ -1,0 +1,6 @@
+2026/05/15 22:27:18 Connected to SQLite database: lucid.db
+2026/05/15 22:27:19 SQLite migration completed successfully
+2026/05/15 22:27:19 🌙 Lucid Dream Journal is running at http://localhost:8080
+2026/05/15 22:27:19 📖 Feed: http://localhost:8080/feed
+2026/05/15 22:27:19 📝 New Dream: http://localhost:8080/dreams/new
+2026/05/15 22:27:19 listen tcp :8080: bind: Only one usage of each socket address (protocol/network address/port) is normally permitted.
