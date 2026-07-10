@@ -9,7 +9,7 @@ require (
 	github.com/mattn/go-sqlite3 v1.14.44
 	github.com/microcosm-cc/bluemonday v1.0.25
 	github.com/rs/cors v1.11.1
-	golang.org/x/crypto v0.51.0
+	golang.org/x/crypto v0.52.0
 )
 
 require (
